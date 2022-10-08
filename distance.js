@@ -11,6 +11,7 @@ import {
 import { parsePath } from 'path-data-parser';
 import { convSvgEllipseParams } from './convertEllipseParams';
 import { svgArcToCenterParam } from './svgArcToCenterParam';
+import { bezierDistanceTo } from './bezier-curve';
 
 // M 100 100 A 20 20 20 1 1 0 100
 function test() {
@@ -147,8 +148,6 @@ function ellipticalArcDistanceTo(ellipticalArc, pt) {
 function isPointInEllipseArcSector(pt) {
   return true;
 }
-
-function bezierDistanceTo(bezier, pt) {}
 
 function distance(a, b) {
   return length(createVectorFromPts(a, b));

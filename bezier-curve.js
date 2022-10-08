@@ -1,6 +1,12 @@
-function bezierDistanceTo(bezier, pt, scale) {
+import { stringifyPts } from './helpers';
+
+export function bezierDistanceTo(bezier, pt, scale = 1) {
   const hull = ConvexHull2D([bezier.a, bezier.b, bezier.cp1, bezier.cp2]);
   const expandedHull = polygonOffset(hull, 1 + 0.3 / scale);
+
+  console.log('hull', stringifyPts(hull));
+  console.log('expanedHull', stringifyPts(expandedHull));
+
   if (isPointInsidePolygon(pt, expandedHull)) {
     this.lut = LUT(this.a, this.b, this.cp1, this.cp2, scale);
     return this.closestNormalDistance(pt, this.lut);
