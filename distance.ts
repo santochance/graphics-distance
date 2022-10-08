@@ -1,21 +1,16 @@
-import {
-  createVectorFromPts,
-  multiply,
-  length,
-  normalize,
-  plus,
-  minus,
-  dot,
-  angle,
-} from './vector';
 import { parsePath } from 'path-data-parser';
+import { bezierDistanceTo, createBezierCurve } from './shapes/BezierCurve';
+import { rad } from "./helpers";
+import { arcDistanceTo, createArcCurve, ellipticalArcDistanceTo } from "./shapes/EllipseCurve";
+import { createSegmentCurve, segmentDistanceTo } from "./shapes/LineCurve";
 import { svgArcToCenterParam } from './svgArcToCenterParam';
-import { bezierDistanceTo } from './bezier-curve';
+import { createVectorFromPts, length, } from './vector';
 
 function initStage() {
   console.log('[stage] inited');
   const stage = document.querySelector('.stage');
 
+  // @ts-ignore
   const elems = Array.from(stage.querySelectorAll('path'));
   elems.forEach((elem) => {
     const curves = parseCurves(elem);
@@ -60,82 +55,11 @@ function getCurrentPosition(ev) {
   return { x: ev.offsetX, y: ev.offsetY };
 }
 
-export function segmentDistanceTo(seg, pt) {
-  const segVec = createVectorFromPts(seg.a, seg.b);
-  const segDir = normalize(segVec);
-  const apVec = createVectorFromPts(seg.a, pt);
-  const project = dot(segDir, apVec);
-  if (project < 0) {
-    return distance(seg.a, pt);
-  }
-  if (project > length(segVec)) {
-    return distance(seg.b, pt);
-  }
-  const projectVec = multiply(segDir, project);
-  const projectPt = plus(seg.a, projectVec);
-  return distance(projectPt, pt);
-}
-
-function arcDistanceTo(arc, pt) {
-  let dist;
-  if (isPointInArcSector(arc, pt)) {
-    dist = Math.abs(distance(arc.c, pt) - arc.radiuX);
-  } else {
-    dist = Math.max(distance(arc.s, pt), distance(arc.e, pt));
-  }
-  return dist;
-}
-
-function isPointInArcSector(arc, pt) {
-  const vec = createVectorFromPts(arc.c, pt);
-  const ang = angle(vec);
-  return angleBetween(ang, arc.startAngle, arc.endAngle, arc.clockwise);
-}
-
-function ellipseDistanceTo(ellipse, pt) {
-  const polarPoint = toEllipseCoordinateSystem(ellipse, pt);
-  const L = radiusAtAngle(ellipse, polarPoint.angle);
-  return Math.abs(polarPoint.radius - L);
-}
-
-function toEllipseCoordinateSystem(ellipse, pt) {
-  let x = pt.x - ellipse.c.x;
-  let y = pt.y - ellipse.c.y;
-  const angle = Math.atan2(y, x) - ellipse.rotation;
-  const radius = distance({ x: 0, y: 0 }, { x, y });
-  x = radius * Math.cos(angle);
-  y = radius * Math.sin(angle);
-  return { x, y, angle, radius };
-}
-
-function radiusAtAngle(ellipse, angle) {
-  return Math.sqrt(
-    1 /
-      (sq(Math.cos(angle) / ellipse.radiuX) +
-        sq(Math.sin(angle) / ellipse.radiuY))
-  );
-}
-
-function sq(a) {
+export function sq(a) {
   return a * a;
 }
 
-function ellipticalArcDistanceTo(ellipticalArc, pt) {
-  if (isPointInArcSector(ellipticalArc, pt)) {
-    return ellipseDistanceTo(ellipticalArc, pt);
-  } else {
-    return Math.max(
-      distance(ellipticalArc.s, pt),
-      distance(ellipticalArc.e, pt)
-    );
-  }
-}
-
-function isPointInEllipseArcSector(pt) {
-  return true;
-}
-
-function distance(a, b) {
+export function distance(a, b) {
   return length(createVectorFromPts(a, b));
 }
 
@@ -160,14 +84,6 @@ function curveDistanceTo(curve, pt) {
   } else {
     return Infinity;
   }
-}
-
-function rad(deg) {
-  return (deg / 180) * Math.PI;
-}
-
-function deg(rad) {
-  return (rad / Math.PI) * 180;
 }
 
 function parseCurves(elem) {
@@ -248,67 +164,6 @@ function parseCurves(elem) {
     }
   }
   return curves;
-}
-
-export function createSegmentCurve(a, b) {
-  return {
-    type: 'segment',
-    a,
-    b,
-  };
-}
-
-function createArcCurve(
-  s,
-  e,
-  c,
-  radiuX,
-  radiuY,
-  startAngle,
-  endAngle,
-  rotation = 0,
-  clockwise
-) {
-  return {
-    type: 'arc',
-    s,
-    e,
-    c,
-    radiuX,
-    radiuY,
-    startAngle,
-    endAngle,
-    rotation,
-    clockwise,
-  };
-}
-
-function createBezierCurve(a, b, cp1, cp2) {
-  return {
-    type: 'bezier',
-    a,
-    b,
-    cp1,
-    cp2,
-  };
-}
-
-function angleBetween(theta, s, e, clockwise = true) {
-  let sRadian = clockwise ? s : e;
-  let eRadian = clockwise ? e : s;
-  if (Math.abs(sRadian - eRadian) < Number.EPSILON) return false;
-
-  if (eRadian < sRadian) {
-    if (sRadian > theta) {
-      theta += 2 * Math.PI;
-    }
-    eRadian += 2 * Math.PI;
-  }
-
-  if (theta > eRadian + Number.EPSILON || theta < sRadian - Number.EPSILON) {
-    return false;
-  }
-  return true;
 }
 
 initStage();

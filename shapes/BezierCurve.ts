@@ -1,7 +1,6 @@
-import { Vector } from './vector';
-import { BBox } from './bbox';
-import { stringifyPts } from './helpers';
-import { createSegmentCurve, segmentDistanceTo } from './distance';
+import { Vector } from '../vector';
+import { BBox } from '../bbox';
+import { createSegmentCurve, segmentDistanceTo } from "./LineCurve";
 
 export function bezierDistanceTo(bezier, pt, scale = 1) {
   const hull = ConvexHull2D([bezier.a, bezier.b, bezier.cp1, bezier.cp2]);
@@ -160,4 +159,14 @@ export function closestNormalDistance(aim, segments) {
     }
   }
   return hero;
+}
+
+export function createBezierCurve(a, b, cp1, cp2) {
+  return {
+    type: 'bezier',
+    a,
+    b,
+    cp1,
+    cp2,
+  };
 }
