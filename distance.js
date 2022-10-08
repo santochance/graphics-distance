@@ -92,14 +92,8 @@ function arcDistanceTo(arc, pt) {
 }
 
 function isPointInArcSector(arc, pt) {
-  // return true;
   const vec = createVectorFromPts(arc.c, pt);
   const ang = angle(vec);
-  console.log('vec', vec, 'ang', ang);
-  console.log('startAngle, endAngle', arc.startAngle, arc.endAngle);
-  // console.log('ang', ang);
-  // return ang >= arc.startAngle && ang <= arc.endAngle;
-  // return angleBetween(ang,)
   return angleBetween(ang, arc.startAngle, arc.endAngle, arc.clockwise);
 }
 
@@ -110,15 +104,12 @@ function ellipseDistanceTo(ellipse, pt) {
 }
 
 function toEllipseCoordinateSystem(ellipse, pt) {
-  console.log('pointer pt', pt);
   let x = pt.x - ellipse.c.x;
   let y = pt.y - ellipse.c.y;
   const angle = Math.atan2(y, x) - ellipse.rotation;
   const radius = distance({ x: 0, y: 0 }, { x, y });
   x = radius * Math.cos(angle);
   y = radius * Math.sin(angle);
-  console.log('radius', radius);
-  console.log('angle', angle);
   return { x, y, angle, radius };
 }
 
@@ -135,7 +126,7 @@ function sq(a) {
 }
 
 function ellipticalArcDistanceTo(ellipticalArc, pt) {
-  if (isPointInEllipseArcSector(ellipticalArc, pt)) {
+  if (isPointInArcSector(ellipticalArc, pt)) {
     return ellipseDistanceTo(ellipticalArc, pt);
   } else {
     return Math.max(
