@@ -1,18 +1,21 @@
-import { distance } from "../helpers";
-import { createVectorFromPts, dot, length, multiply, normalize, plus } from "../vector";
+import { distance } from "../math/helpers";
+import { dot, length, minus, multiply, normalize, plus } from "../math/Vector2";
 
 export function createSegmentCurve(a, b) {
   return {
     type: 'segment',
     a,
     b,
+    distanceTo(pt) {
+      return segmentDistanceTo(this, pt);
+    }
   };
 }
 
 export function segmentDistanceTo(seg, pt) {
-  const segVec = createVectorFromPts(seg.a, seg.b);
+  const segVec = minus(seg.b, seg.a);
   const segDir = normalize(segVec);
-  const apVec = createVectorFromPts(seg.a, pt);
+  const apVec = minus(pt, seg.a);
   const project = dot(segDir, apVec);
   if (project < 0) {
     return distance(seg.a, pt);

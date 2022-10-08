@@ -1,6 +1,3 @@
-import { bezierDistanceTo } from './shapes/BezierCurve';
-import { arcDistanceTo, ellipticalArcDistanceTo } from "./shapes/EllipseCurve";
-import { segmentDistanceTo } from "./shapes/LineCurve";
 import { hitTest, parseCurves } from "./shapes/Path";
 
 function initStage() {
@@ -43,20 +40,6 @@ function initStage() {
 
 function getCurrentPosition(ev) {
   return { x: ev.offsetX, y: ev.offsetY };
-}
-
-export function curveDistanceTo(curve, pt) {
-  if (curve.type === 'segment') {
-    return segmentDistanceTo(curve, pt);
-  } else if (curve.type === 'arc') {
-    return curve.radiusX === curve.radiusY
-      ? arcDistanceTo(curve, pt)
-      : ellipticalArcDistanceTo(curve, pt);
-  } else if (curve.type === 'bezier') {
-    return bezierDistanceTo(curve, pt);
-  } else {
-    return Infinity;
-  }
 }
 
 initStage();

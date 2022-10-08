@@ -1,8 +1,10 @@
-export class Vector {
-  constructor(x = 0, y = 0, z = 0) {
+export class Vector2 {
+  x: number;
+  y: number;
+
+  constructor(x = 0, y = 0) {
     this.x = x || 0;
     this.y = y || 0;
-    this.z = z || 0;
   }
 
   plus(vec) {
@@ -16,7 +18,6 @@ export class Vector {
   _minus(vector) {
     this.x -= vector.x;
     this.y -= vector.y;
-    this.z -= vector.z;
     return this;
   }
 
@@ -96,10 +97,3 @@ export function normalize(vec) {
   };
 }
 
-export function createVector(x = 0, y = 0) {
-  return { x, y };
-}
-
-export function createVectorFromPts(a, b) {
-  return minus(b, a);
-}

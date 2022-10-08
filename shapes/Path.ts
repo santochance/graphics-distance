@@ -1,7 +1,6 @@
 import { parsePath } from "path-data-parser";
-import { curveDistanceTo } from "../distance";
-import { rad } from "../helpers";
-import { svgArcToCenterParam } from "../svgArcToCenterParam";
+import { rad } from "../math/helpers";
+import { svgArcToCenterParam } from "../math/svgArcToCenterParam";
 import { createBezierCurve } from "./BezierCurve";
 import { createArcCurve } from "./EllipseCurve";
 import { createSegmentCurve } from "./LineCurve";
@@ -13,7 +12,7 @@ export class Path {
 export function hitTest(elem, pt, touchTor = 4) {
     const curves = elem.curves;
     return curves.some((curve) => {
-        const dist = curveDistanceTo(curve, pt);
+        const dist = curve.distanceTo(pt);
         return dist <= touchTor;
     });
 }

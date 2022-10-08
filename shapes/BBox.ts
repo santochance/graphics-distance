@@ -1,4 +1,4 @@
-import { Vector } from './vector';
+import { Vector2 } from '../math/Vector2';
 
 export class BBox {
   minX: number;
@@ -25,7 +25,7 @@ export class BBox {
   }
 
   center() {
-    return new Vector(
+    return new Vector2(
       this.minX + (this.maxX - this.minX) / 2,
       this.minY + (this.maxY - this.minY) / 2,
     );

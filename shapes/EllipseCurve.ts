@@ -1,5 +1,5 @@
-import { angleBetween, distance, sq } from "../helpers";
-import { angle, createVectorFromPts } from "../vector";
+import { angleBetween, distance, sq } from "../math/helpers";
+import { angle, minus } from "../math/Vector2";
 
 export function createArcCurve(
     s,
@@ -23,11 +23,18 @@ export function createArcCurve(
         endAngle,
         rotation,
         clockwise,
+        distanceTo(pt) {
+            if (this.radiusX === radiusY) {
+                return arcDistanceTo(this, pt);
+            } else {
+                return ellipseDistanceTo(this, pt);
+            }
+        }
     };
 }
 
 export function isPointInArcSector(arc, pt) {
-    const vec = createVectorFromPts(arc.c, pt);
+    const vec = minus(pt, arc.c);
     const ang = angle(vec);
     return angleBetween(ang, arc.startAngle, arc.endAngle, arc.clockwise);
 }

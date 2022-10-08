@@ -1,4 +1,4 @@
-import { createVectorFromPts, length } from "./vector";
+import { length, minus } from "./Vector2";
 
 export function stringifyPts(pts) {
   return pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`).join(' ');
@@ -37,5 +37,5 @@ export function sq(a) {
 }
 
 export function distance(a, b) {
-  return length(createVectorFromPts(a, b));
+  return length(minus(b, a));
 }

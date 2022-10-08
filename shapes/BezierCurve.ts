@@ -1,5 +1,5 @@
-import { Vector } from '../vector';
-import { BBox } from '../BBox';
+import { Vector2 } from '../math/Vector2';
+import { BBox } from './BBox';
 import { createSegmentCurve, segmentDistanceTo } from "./LineCurve";
 
 export function bezierDistanceTo(bezier, pt, scale = 1) {
@@ -49,7 +49,7 @@ export function polygonOffsetXY(polygon, scaleX, scaleY) {
   const scaledBBox = new BBox();
   const result = [];
   for (const point of polygon) {
-    const scaledPoint = new Vector(point.x * scaleX, point.y * scaleY);
+    const scaledPoint = new Vector2(point.x * scaleX, point.y * scaleY);
     result.push(scaledPoint);
     origBBox.checkPoint(point);
     scaledBBox.checkPoint(scaledPoint);
@@ -101,9 +101,9 @@ export function isPointInsidePolygon(inPt, inPolygon) {
         inside = !inside; // true intersection left of inPt
       }
     } else {
-      // parallel or colinear
+      // parallel or collinear
       if (inPt.y != edgeLowPt.y) continue; // parallel
-      // egde lies on the same horizontal line as inPt
+      // edge lies on the same horizontal line as inPt
       if (
         (edgeHighPt.x <= inPt.x && inPt.x <= edgeLowPt.x) ||
         (edgeLowPt.x <= inPt.x && inPt.x <= edgeHighPt.x)
@@ -141,10 +141,9 @@ export function compute(t, from, to, controlPoint1, controlPoint2) {
   const p3 = to;
   const p1 = controlPoint1;
   const p2 = controlPoint2;
-  return new Vector(
+  return new Vector2(
     a * p0.x + b * p1.x + c * p2.x + d * p3.x,
     a * p0.y + b * p1.y + c * p2.y + d * p3.y,
-    a * p0.z + b * p1.z + c * p2.z + d * p3.z
   );
 }
 
@@ -168,5 +167,8 @@ export function createBezierCurve(a, b, cp1, cp2) {
     b,
     cp1,
     cp2,
+    distanceTo(pt) {
+      return bezierDistanceTo(this, pt);
+    }
   };
 }
