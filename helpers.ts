@@ -1,3 +1,5 @@
+import { createVectorFromPts, length } from "./vector";
+
 export function stringifyPts(pts) {
   return pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`).join(' ');
 }
@@ -5,6 +7,7 @@ export function stringifyPts(pts) {
 export function angleBetween(theta, s, e, clockwise = true) {
   let sRadian = clockwise ? s : e;
   let eRadian = clockwise ? e : s;
+  // @ts-ignore
   if (Math.abs(sRadian - eRadian) < Number.EPSILON) return false;
   
   if (eRadian < sRadian) {
@@ -14,6 +17,7 @@ export function angleBetween(theta, s, e, clockwise = true) {
     eRadian += 2 * Math.PI;
   }
   
+  // @ts-ignore
   if (theta > eRadian + Number.EPSILON || theta < sRadian - Number.EPSILON) {
     return false;
   }
@@ -26,4 +30,12 @@ export function rad(deg) {
 
 export function deg(rad) {
   return (rad / Math.PI) * 180;
+}
+
+export function sq(a) {
+  return a * a;
+}
+
+export function distance(a, b) {
+  return length(createVectorFromPts(a, b));
 }

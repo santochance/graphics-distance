@@ -113,13 +113,12 @@ export function svgArcToCenterParam(x1, y1, rx, ry, phi, fA, fS, x2, y2) {
     endAngle: endAngle,
     startDeg: deg(startAngle),
     endDeg: deg(endAngle),
-    radiuX: rx,
-    radiuY: ry,
+    radiusX: rx,
+    radiusY: ry,
     clockwise: fS == true || fS == 1,
     sAng,
     eAng,
   };
 
-  console.log('outputObj', outputObj);
   return outputObj;
 }

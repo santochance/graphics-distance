@@ -1,13 +1,12 @@
-import { distance, sq } from "../distance";
-import { angleBetween } from "../helpers";
+import { angleBetween, distance, sq } from "../helpers";
 import { angle, createVectorFromPts } from "../vector";
 
 export function createArcCurve(
     s,
     e,
     c,
-    radiuX,
-    radiuY,
+    radiusX,
+    radiusY,
     startAngle,
     endAngle,
     rotation = 0,
@@ -18,8 +17,8 @@ export function createArcCurve(
         s,
         e,
         c,
-        radiuX,
-        radiuY,
+        radiusX,
+        radiusY,
         startAngle,
         endAngle,
         rotation,
@@ -36,7 +35,7 @@ export function isPointInArcSector(arc, pt) {
 export function arcDistanceTo(arc, pt) {
     let dist;
     if (isPointInArcSector(arc, pt)) {
-        dist = Math.abs(distance(arc.c, pt) - arc.radiuX);
+        dist = Math.abs(distance(arc.c, pt) - arc.radiusX);
     } else {
         dist = Math.max(distance(arc.s, pt), distance(arc.e, pt));
     }
@@ -62,8 +61,8 @@ export function toEllipseCoordinateSystem(ellipse, pt) {
 export function radiusAtAngle(ellipse, angle) {
     return Math.sqrt(
         1 /
-        (sq(Math.cos(angle) / ellipse.radiuX) +
-            sq(Math.sin(angle) / ellipse.radiuY))
+        (sq(Math.cos(angle) / ellipse.radiusX) +
+            sq(Math.sin(angle) / ellipse.radiusY))
     );
 }
 

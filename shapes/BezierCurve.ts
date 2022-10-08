@@ -1,5 +1,5 @@
 import { Vector } from '../vector';
-import { BBox } from '../bbox';
+import { BBox } from '../BBox';
 import { createSegmentCurve, segmentDistanceTo } from "./LineCurve";
 
 export function bezierDistanceTo(bezier, pt, scale = 1) {

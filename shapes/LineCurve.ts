@@ -1,4 +1,4 @@
-import { distance } from "../distance";
+import { distance } from "../helpers";
 import { createVectorFromPts, dot, length, multiply, normalize, plus } from "../vector";
 
 export function createSegmentCurve(a, b) {
