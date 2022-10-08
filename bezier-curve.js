@@ -1,4 +1,7 @@
+import { Vector } from './vector';
+import { BBox } from './bbox';
 import { stringifyPts } from './helpers';
+import { createSegmentCurve, segmentDistanceTo } from './distance';
 
 export function bezierDistanceTo(bezier, pt, scale = 1) {
   const hull = ConvexHull2D([bezier.a, bezier.b, bezier.cp1, bezier.cp2]);
@@ -8,8 +11,8 @@ export function bezierDistanceTo(bezier, pt, scale = 1) {
   console.log('expanedHull', stringifyPts(expandedHull));
 
   if (isPointInsidePolygon(pt, expandedHull)) {
-    this.lut = LUT(this.a, this.b, this.cp1, this.cp2, scale);
-    return this.closestNormalDistance(pt, this.lut);
+    bezier.lut = LUT(bezier.a, bezier.b, bezier.cp1, bezier.cp2, scale);
+    return closestNormalDistance(pt, bezier.lut);
   }
   return -1;
 }
@@ -150,6 +153,15 @@ export function compute(t, from, to, controlPoint1, controlPoint2) {
   );
 }
 
-export class BBox {}
-
-export class Vector {}
+export function closestNormalDistance(aim, segments) {
+  let hero = -1;
+  for (let p = segments.length - 1, q = 0; q < segments.length; p = q++) {
+    const dist = Math.min(
+      segmentDistanceTo(createSegmentCurve(segments[p], segments[q]), aim)
+    );
+    if (dist !== -1) {
+      hero = hero === -1 ? dist : Math.min(dist, hero);
+    }
+  }
+  return hero;
+}

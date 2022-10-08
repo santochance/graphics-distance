@@ -65,7 +65,7 @@ function getCurrentPosition(ev) {
   return { x: ev.offsetX, y: ev.offsetY };
 }
 
-function segmentDistanceTo(seg, pt) {
+export function segmentDistanceTo(seg, pt) {
   const segVec = createVectorFromPts(seg.a, seg.b);
   const segDir = normalize(segVec);
   const apVec = createVectorFromPts(seg.a, pt);
@@ -242,9 +242,11 @@ function parseCurves(elem) {
         x: data[4],
         y: data[5],
       };
-      curves.push(createSegmentCurve(currPt, cp1));
-      curves.push(createSegmentCurve(cp1, cp2));
-      curves.push(createSegmentCurve(cp2, targetPt));
+      // curves.push(createSegmentCurve(currPt, cp1));
+      // curves.push(createSegmentCurve(cp1, cp2));
+      // curves.push(createSegmentCurve(cp2, targetPt));
+      const curve = createBezierCurve(currPt, targetPt, cp1, cp2);
+      curves.push(curve);
       currPt = targetPt;
     } else if (type === 'Z') {
       const curve = createSegmentCurve(currPt, lastMovePt);
@@ -255,7 +257,7 @@ function parseCurves(elem) {
   return curves;
 }
 
-function createSegmentCurve(a, b) {
+export function createSegmentCurve(a, b) {
   return {
     type: 'segment',
     a,
@@ -285,6 +287,16 @@ function createArcCurve(
     endAngle, // rad
     rotation, // rad
     phi, // deg
+  };
+}
+
+function createBezierCurve(a, b, cp1, cp2) {
+  return {
+    type: 'bezier',
+    a,
+    b,
+    cp1,
+    cp2,
   };
 }
 
