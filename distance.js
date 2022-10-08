@@ -9,29 +9,8 @@ import {
   angle,
 } from './vector';
 import { parsePath } from 'path-data-parser';
-import { convSvgEllipseParams } from './convertEllipseParams';
 import { svgArcToCenterParam } from './svgArcToCenterParam';
 import { bezierDistanceTo } from './bezier-curve';
-
-// M 100 100 A 20 20 20 1 1 0 100
-function test() {
-  const [x1, y1, rx, ry, phi, fa, fs, x2, y2] = [
-    0, 0, 20, 20, 20, 1, 1, 0, 100,
-  ];
-  // const result1 = convSvgEllipseParams(
-  //   { x: x1, y: y1 },
-  //   { x: x2, y: y2 },
-  //   rx,
-  //   ry,
-  //   phi,
-  //   fa,
-  //   fs
-  // );
-  // console.log('result1', result1);
-  const result2 = svgArcToCenterParam(x1, y1, rx, ry, phi, fa, fs, x2, y2);
-  console.log('result2', result2);
-}
-// test();
 
 function initStage() {
   console.log('[stage] inited');
@@ -44,13 +23,20 @@ function initStage() {
     elem.dataset['curves'] = JSON.stringify(curves);
   });
 
+  const onMousemove = (ev) => {
+    const pos = getCurrentPosition(ev);
+    const hits = searchElementsByPoint(elems, pos);
+    elems.forEach((el) => {
+      el.classList.remove('is-hover');
+    });
+    hits.forEach((el) => {
+      el.classList.add('is-hover');
+    });
+  };
+
   const onMousedown = (ev) => {
     const pos = getCurrentPosition(ev);
-    const hits = elems.filter((elem) => {
-      const isTouched = isTouchPathElement(elem, pos);
-      return isTouched;
-    });
-    console.log('hit elems', hits);
+    const hits = searchElementsByPoint(elems, pos);
     elems.forEach((el) => {
       el.classList.remove('is-hit');
     });
@@ -58,7 +44,16 @@ function initStage() {
       el.classList.add('is-hit');
     });
   };
+
+  stage.addEventListener('mousemove', onMousemove);
   stage.addEventListener('mousedown', onMousedown);
+}
+
+function searchElementsByPoint(elems, pos) {
+  return elems.filter((elem) => {
+    const isTouched = isTouchPathElement(elem, pos);
+    return isTouched;
+  });
 }
 
 function getCurrentPosition(ev) {
