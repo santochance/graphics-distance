@@ -92,20 +92,20 @@ function arcDistanceTo(arc, pt) {
 }
 
 function isPointInArcSector(arc, pt) {
-  return true;
-  // const vec = createVectorFromPts(arc.c, pt);
-  // console.log('vec', vec);
-  // const ang = angle(vec);
-  // console.log('startAngle, endAngle', arc.startAngle, arc.endAngle);
+  // return true;
+  const vec = createVectorFromPts(arc.c, pt);
+  const ang = angle(vec);
+  console.log('vec', vec, 'ang', ang);
+  console.log('startAngle, endAngle', arc.startAngle, arc.endAngle);
   // console.log('ang', ang);
   // return ang >= arc.startAngle && ang <= arc.endAngle;
+  // return angleBetween(ang,)
+  return angleBetween(ang, arc.startAngle, arc.endAngle, arc.clockwise);
 }
 
 function ellipseDistanceTo(ellipse, pt) {
   const polarPoint = toEllipseCoordinateSystem(ellipse, pt);
-  console.log('polarPoint', polarPoint);
   const L = radiusAtAngle(ellipse, polarPoint.angle);
-  console.log('L', L);
   return Math.abs(polarPoint.radius - L);
 }
 
@@ -209,8 +209,16 @@ function parseCurves(elem) {
     } else if (type === 'A') {
       const { x: x1, y: y1 } = currPt;
       const [rx, ry, phi, fa, fs, x2, y2] = data;
-      const { cx, cy, radiuX, radiuY, startAngle, endAngle } =
-        svgArcToCenterParam(x1, y1, rx, ry, phi, fa, fs, x2, y2);
+      const radPhi = rad(phi);
+      const {
+        cx,
+        cy,
+        radiuX,
+        radiuY,
+        sAng: startAngle,
+        eAng: endAngle,
+        clockwise,
+      } = svgArcToCenterParam(x1, y1, rx, ry, radPhi, fa, fs, x2, y2);
       const targetPt = {
         x: x2,
         y: y2,
@@ -223,10 +231,9 @@ function parseCurves(elem) {
         radiuY,
         startAngle,
         endAngle,
-        rad(phi),
-        phi
+        radPhi,
+        clockwise
       );
-      console.log('curve', curve);
       curves.push(curve);
       currPt = targetPt;
     } else if (type === 'C') {
@@ -274,7 +281,7 @@ function createArcCurve(
   startAngle,
   endAngle,
   rotation = 0,
-  phi
+  clockwise
 ) {
   return {
     type: 'arc',
@@ -283,10 +290,10 @@ function createArcCurve(
     c,
     radiuX,
     radiuY,
-    startAngle, // rad
-    endAngle, // rad
-    rotation, // rad
-    phi, // deg
+    startAngle,
+    endAngle,
+    rotation,
+    clockwise,
   };
 }
 
@@ -298,6 +305,24 @@ function createBezierCurve(a, b, cp1, cp2) {
     cp1,
     cp2,
   };
+}
+
+function angleBetween(theta, s, e, clockwise = true) {
+  let sRadian = clockwise ? s : e;
+  let eRadian = clockwise ? e : s;
+  if (Math.abs(sRadian - eRadian) < Number.EPSILON) return false;
+
+  if (eRadian < sRadian) {
+    if (sRadian > theta) {
+      theta += 2 * Math.PI;
+    }
+    eRadian += 2 * Math.PI;
+  }
+
+  if (theta > eRadian + Number.EPSILON || theta < sRadian - Number.EPSILON) {
+    return false;
+  }
+  return true;
 }
 
 initStage();

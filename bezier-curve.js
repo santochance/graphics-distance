@@ -6,15 +6,11 @@ import { createSegmentCurve, segmentDistanceTo } from './distance';
 export function bezierDistanceTo(bezier, pt, scale = 1) {
   const hull = ConvexHull2D([bezier.a, bezier.b, bezier.cp1, bezier.cp2]);
   const expandedHull = polygonOffset(hull, 1 + 0.3 / scale);
-
-  console.log('hull', stringifyPts(hull));
-  console.log('expanedHull', stringifyPts(expandedHull));
-
   if (isPointInsidePolygon(pt, expandedHull)) {
     bezier.lut = LUT(bezier.a, bezier.b, bezier.cp1, bezier.cp2, scale);
     return closestNormalDistance(pt, bezier.lut);
   }
-  return -1;
+  return Infinity;
 }
 
 export function ConvexHull2D(points) {

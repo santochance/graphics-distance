@@ -9,6 +9,14 @@ function radian(ux, uy, vx, vy) {
   }
   return rad;
 }
+
+function deg(rad) {
+  if (rad < 0 || rad > Math.PI * 2) {
+    rad = (Math.PI * 2 + rad) % (Math.PI * 2);
+  }
+  return (rad / Math.PI) * 180;
+}
+
 //conversion_from_endpoint_to_center_parameterization
 //sample :  svgArcToCenterParam(200,200,50,50,0,1,1,300,200)
 // x1 y1 rx ry φ fA fS x2 y2
@@ -72,7 +80,7 @@ export function svgArcToCenterParam(x1, y1, rx, ry, phi, fA, fS, x2, y2) {
   var ycr2 = (y1_ + cy_) / ry;
 
   // F6.5.5
-  startAngle = radian(1.0, 0.0, xcr1, ycr1);
+  startAngle = radian(1.0, 0.0, xcr1, ycr1) + phi;
 
   // F6.5.6
   deltaAngle = radian(xcr1, ycr1, -xcr2, -ycr2);
@@ -93,6 +101,9 @@ export function svgArcToCenterParam(x1, y1, rx, ry, phi, fA, fS, x2, y2) {
     endAngle += PIx2;
   }
 
+  const sAng = Math.atan2(y1 - cy, x1 - cx);
+  const eAng = Math.atan2(y2 - cy, x2 - cx);
+
   var outputObj = {
     /* cx, cy, startAngle, deltaAngle */
     cx: cx,
@@ -100,10 +111,15 @@ export function svgArcToCenterParam(x1, y1, rx, ry, phi, fA, fS, x2, y2) {
     startAngle: startAngle,
     deltaAngle: deltaAngle,
     endAngle: endAngle,
+    startDeg: deg(startAngle),
+    endDeg: deg(endAngle),
     radiuX: rx,
     radiuY: ry,
     clockwise: fS == true || fS == 1,
+    sAng,
+    eAng,
   };
 
+  console.log('outputObj', outputObj);
   return outputObj;
 }
