@@ -9,7 +9,7 @@ export class Path {
 
 }
 
-export function hitTest(elem, pt, touchTor = 4) {
+export function hitTest(elem, pt, touchTor = 2) {
     const curves = elem.curves;
     return curves.some((curve) => {
         const dist = curve.distanceTo(pt);
