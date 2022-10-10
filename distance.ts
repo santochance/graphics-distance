@@ -77,6 +77,12 @@ function createPath(elem) {
     path = basePath.addPath(basePath.copy().stroke(strokeStyle));
   }
 
+  const transform = elem.transform.baseVal.consolidate();
+  if (transform) {
+    const { a: scaleX, b: skewY, c: skewX, d: scaleY, e: transX, f: transY } = transform.matrix;
+    path.transform(scaleX, skewX, transX, skewY, scaleY, transY, 0, 0, 1);
+  }
+
   return path;
 }
 
