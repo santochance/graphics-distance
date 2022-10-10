@@ -12,6 +12,7 @@
     "vite": "^3.1.4"
   },
   "dependencies": {
+    "canvaskit-wasm": "^0.37.0",
     "path-data-parser": "^0.1.0"
   }
 }
