@@ -6,9 +6,77 @@ import CanvasKitWasm from "canvaskit-wasm/bin/canvaskit.wasm?url";
 const CanvasKit = await CanvasKitInit({ locateFile: () => CanvasKitWasm });
 console.log('CanvasKit inited', CanvasKit);
 
+type SVGStrokeLineJoin = 'miter' | 'bevel' | 'round';
+const toSkStrokeJoin = (lineJoin: SVGStrokeLineJoin) => {
+  switch(lineJoin) {
+    case 'bevel': 
+      return CanvasKit.StrokeJoin.Bevel;
+    case 'round': 
+      return CanvasKit.StrokeCap.Round;
+    case 'miter': 
+    default: 
+      return CanvasKit.StrokeCap.Miter;
+  }
+}
+
+type SVGStrokeLineCap =  'butt' | 'round' | 'square'
+const toSkStrokeCap = (lineCap: SVGStrokeLineCap) => {
+  switch(lineCap) {
+    case 'butt': 
+      return CanvasKit.StrokeCap.Butt;
+    case 'round': 
+      return CanvasKit.StrokeCap.Round;
+    case 'square': 
+      return CanvasKit.StrokeCap.Square;
+  }
+}
+
+function parseStrokeStyle(computedStyle, expandedWidth = 0) {
+  const strokeStyle = { } as { width?: number, join?, cap?, miter_limit?: number, precision?: number };
+  const width = computedStyle.get('stroke-width').value;
+  if (isFinite(width)) {
+    strokeStyle.width = width + expandedWidth;
+  }
+  const lineJoin = computedStyle.get('stroke-linejoin').value;
+  if (lineJoin) {
+    strokeStyle.join = toSkStrokeJoin(lineJoin);
+
+  }
+  const lineCap = computedStyle.get('stroke-linecap').value;
+  if (lineCap) {
+    strokeStyle.cap = toSkStrokeCap(lineCap);
+  }
+  const miterLimit = computedStyle.get('stroke-miterlimit').value;
+  if (isFinite(miterLimit)) {
+    strokeStyle.miter_limit = miterLimit;
+  }
+  return strokeStyle;
+}
+
+
 function createPath(elem) {
+  const computedStyle = elem.computedStyleMap();
+  const fillColor = computedStyle.get('fill').toString();
+  const strokeColor = computedStyle.get('stroke').toString();
+  const strokeWidth = computedStyle.get('stroke-width').value;
+  const isShowFill = fillColor !== 'none';
+  const isShowStroke = strokeColor !== 'none' && strokeWidth > 0;
+  if (!isShowFill && !isShowStroke) {
+    return;
+  }
+
   const pathD = elem.getAttribute('d');
-  const path = CanvasKit.Path.MakeFromSVGString(pathD);
+  const basePath = CanvasKit.Path.MakeFromSVGString(pathD);
+  const strokeStyle = isShowStroke ? parseStrokeStyle(computedStyle, 1) : undefined;
+  let path;
+  if (isShowFill && !isShowStroke) {
+    path = basePath;
+  } else if (!isShowFill && isShowStroke) {
+    path = basePath.stroke(strokeStyle);
+  } else {
+    path = basePath.addPath(basePath.copy().stroke(strokeStyle));
+  }
+
   return path;
 }
 
@@ -54,7 +122,7 @@ function initStage() {
 
 function searchElemsByPt(elems, pt) {
   // return elems.filter((elem) => hitTest(elem, pt));
-  return elems.filter((elem) => elem.pathInst.contains(pt.x, pt.y));
+  return elems.filter((elem) => elem.pathInst?.contains(pt.x, pt.y));
 }
 
 function getCurrentPosition(ev) {
