@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "canvaskit-wasm": "^0.37.0",
-    "path-data-parser": "^0.1.0"
+    "path-data-parser": "^0.1.0",
+    "pathkit-wasm": "^1.0.0"
   }
 }

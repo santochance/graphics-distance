@@ -3,8 +3,88 @@ import { hitTest, parseCurves } from "./shapes/Path";
 import CanvasKitInit from "canvaskit-wasm/bin/canvaskit.js";
 import CanvasKitWasm from "canvaskit-wasm/bin/canvaskit.wasm?url";
 
+import PathKitInit from "pathkit-wasm/bin/pathkit.js";
+import PathKitWasm from "pathkit-wasm/bin/pathkit.wasm?url";
+
 const CanvasKit = await CanvasKitInit({ locateFile: () => CanvasKitWasm });
 console.log('CanvasKit inited', CanvasKit);
+
+const PathKit = await PathKitInit({ locateFile: () => PathKitWasm });
+console.log('PathKit inited', PathKit);
+
+function logPath(path, label) {
+  console.log(label,{
+    toCmds: path.toCmds(),
+    toPath2D: path.toPath2D?.(),
+    toSvgString: path.toSVGString(),
+  })
+}
+
+function testCanvasKitAddCircle() {
+  const path = new CanvasKit.Path().addCircle(10, 10, 10);
+  logPath(path, 'canvaskit circle');
+}
+
+function testPathKitArc() {
+  const path = PathKit.NewPath().arc(10, 10, 10, 20 / 180 * Math.PI, Math.PI * 1.4 , false);
+  logPath(path, 'pathkit arc');
+}
+
+function testPathKitFullCircle() {
+  const path = PathKit.NewPath().arc(10, 10, 10, 0, Math.PI * 2, false);
+  logPath(path, 'pathkit fullCircle arc');
+}
+
+function testPathKitEllipse() {
+  const path = PathKit.NewPath().ellipse(30, 40, 10, 20, 0, 0, Math.PI * 2, false).simplify();
+  logPath(path, 'pathkit ellipse');
+}
+
+function testPathKitBox() {
+  const path = PathKit.NewPath().rect(0, 0, 100, 100);
+  logPath(path, 'pathkit box');
+}
+
+function testPathKitCubicTo() {
+  const path = PathKit.NewPath().moveTo(0, 0).cubicTo(100, 100, 200, 500, 20, 800);
+  logPath(path, 'pathkit cubicTo');
+}
+
+function testPathKitQuadTo() {
+  const path = PathKit.NewPath().moveTo(0, 0).quadTo(200, 200, 300, 50);
+  logPath(path, 'pathkit quadTo');
+}
+
+function testPathKitConicTo() {
+  const path = PathKit.NewPath().moveTo(0, 0).conicTo(100, 100, 200, 500, 0.7071);
+  logPath(path, 'pathkit conicTo');
+}
+
+function testPathKitBooleanOp() {
+  let pathOne = PathKit.NewPath().arc(10, 10, 10, 20 / 180 * Math.PI, Math.PI * 1.4 , false);
+  let pathTwo = PathKit.NewPath().ellipse(15, 20, 10, 20, 0, 0, Math.PI * 2, false);
+  // Combine the two triangles to look like two mountains
+  let mountains = pathOne.copy().op(pathTwo, PathKit.PathOp.UNION);
+  logPath(mountains, 'mountains');
+  // set pathOne to be the small triangle where pathOne and pathTwo overlap
+  let newPathOne = pathOne.op(pathTwo, PathKit.PathOp.INTERSECT);
+  // since copy() was called, don't forget to call delete() on mountains.
+  logPath(newPathOne, 'newPathOne');
+}
+
+function testCanvasKitBooleanOp() {
+  // const pathOne = new CanvasKit.Path().
+}
+
+testCanvasKitAddCircle();
+testPathKitArc();
+testPathKitFullCircle();
+testPathKitEllipse();
+testPathKitBox();
+testPathKitCubicTo();
+testPathKitQuadTo();
+testPathKitConicTo();
+testPathKitBooleanOp();
 
 type SVGStrokeLineJoin = 'miter' | 'bevel' | 'round';
 const toSkStrokeJoin = (lineJoin: SVGStrokeLineJoin) => {
