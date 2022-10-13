@@ -1,15 +1,14 @@
 import { hitTest, parseCurves } from "./shapes/Path";
-// import CanvasKitInit from 'canvaskit-wasm/bin/canvaskit.wasm?init';
-import CanvasKitInit from "canvaskit-wasm/bin/canvaskit.js";
-import CanvasKitWasm from "canvaskit-wasm/bin/canvaskit.wasm?url";
+import canvasKitInit from "canvaskit-wasm/bin/canvaskit.js";
+import canvasKitWasmURL from "canvaskit-wasm/bin/canvaskit.wasm?url";
 
-import PathKitInit from "pathkit-wasm/bin/pathkit.js";
-import PathKitWasm from "pathkit-wasm/bin/pathkit.wasm?url";
+import pathKitInit from "pathkit-wasm/bin/pathkit.js";
+import pathKitWasmURL from "pathkit-wasm/bin/pathkit.wasm?url";
 
-const CanvasKit = await CanvasKitInit({ locateFile: () => CanvasKitWasm });
+const CanvasKit = await canvasKitInit({ locateFile: () => canvasKitWasmURL });
 console.log('CanvasKit inited', CanvasKit);
 
-const PathKit = await PathKitInit({ locateFile: () => PathKitWasm });
+const PathKit = await pathKitInit({ locateFile: () => pathKitWasmURL });
 console.log('PathKit inited', PathKit);
 
 function logPath(path, label) {
@@ -23,6 +22,11 @@ function logPath(path, label) {
 function testCanvasKitAddCircle() {
   const path = new CanvasKit.Path().addCircle(10, 10, 10);
   logPath(path, 'canvaskit circle');
+}
+
+function testCanvasKitAddOval() {
+  const path = new CanvasKit.Path().addOval([10, 20, 30, 40]);
+  logPath(path, 'canvaskit oval');
 }
 
 function testPathKitArc() {
@@ -61,29 +65,34 @@ function testPathKitConicTo() {
 }
 
 function testPathKitBooleanOp() {
-  let pathOne = PathKit.NewPath().arc(10, 10, 10, 20 / 180 * Math.PI, Math.PI * 1.4 , false);
-  let pathTwo = PathKit.NewPath().ellipse(15, 20, 10, 20, 0, 0, Math.PI * 2, false);
-  // Combine the two triangles to look like two mountains
-  let mountains = pathOne.copy().op(pathTwo, PathKit.PathOp.UNION);
-  logPath(mountains, 'mountains');
-  // set pathOne to be the small triangle where pathOne and pathTwo overlap
-  let newPathOne = pathOne.op(pathTwo, PathKit.PathOp.INTERSECT);
-  // since copy() was called, don't forget to call delete() on mountains.
-  logPath(newPathOne, 'newPathOne');
+  let circle = PathKit.NewPath().arc(0, 0, 50, 0, Math.PI * 2);
+  let arc = PathKit.NewPath().arc(30, 30, 10, 20 / 180 * Math.PI, Math.PI * 1.4 , false);
+  let ellipse = PathKit.NewPath().ellipse(15, 20, 10, 20, 0, 0, Math.PI * 2, false);
+  let rect = PathKit.NewPath().rect(10, 20, 30, 40);
+  logPath(circle, 'circle');
+  logPath(arc, 'arc');
+  logPath(ellipse, 'ellipse');
+  logPath(rect, 'rect');
+  // let mountains = arc.copy().op(ellipse, PathKit.PathOp.UNION);
+  // logPath(mountains, 'mountains');
+  // let newPathOne = arc.op(ellipse, PathKit.PathOp.INTERSECT);
+  // logPath(newPathOne, 'newPathOne');
+  
 }
 
 function testCanvasKitBooleanOp() {
   // const pathOne = new CanvasKit.Path().
 }
 
-testCanvasKitAddCircle();
-testPathKitArc();
-testPathKitFullCircle();
-testPathKitEllipse();
-testPathKitBox();
-testPathKitCubicTo();
-testPathKitQuadTo();
-testPathKitConicTo();
+// testCanvasKitAddCircle();
+// testCanvasKitAddOval();
+// testPathKitArc();
+// testPathKitFullCircle();
+// testPathKitEllipse();
+// testPathKitBox();
+// testPathKitCubicTo();
+// testPathKitQuadTo();
+// testPathKitConicTo();
 testPathKitBooleanOp();
 
 type SVGStrokeLineJoin = 'miter' | 'bevel' | 'round';
